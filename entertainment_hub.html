@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🎬 Entertainment Hub</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: radial-gradient(circle at top left, #0a0a0f, #12122b, #050509);
+    color: #fff;
+    text-align: center;
+    overflow-x: hidden;
+  }
+
+  header { margin-top: 40px; }
+  header h1 {
+    font-size: 3.5em;
+    margin: 10px 0;
+    letter-spacing: 2px;
+    color: #fff;
+    text-shadow: 0 0 15px #ff007f, 0 0 30px #007bff;
+  }
+  header img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    box-shadow: 0 0 20px #ff007f;
+  }
+
+  .section-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 30px;
+    width: 85%;
+    margin: 50px auto;
+  }
+
+  .section-card {
+    position: relative;
+    height: 250px;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+  }
+  .section-card:hover {
+    transform: scale(1.07);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+  }
+  .section-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.6);
+    transition: filter 0.4s ease;
+  }
+  .section-card:hover::before { filter: brightness(0.9); }
+  .section-label {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    font-size: 1.8em;
+    font-weight: bold;
+    text-shadow: 0 0 15px #000;
+  }
+
+  .movies::before { background-image: url('https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=1000&q=80'); }
+  .memes::before { background-image: url('https://img.freepik.com/premium-photo/funny-memes-concept-collage-design_1194-537223.jpg?w=996'); }
+  .quiz::before { background-image: url('https://img.freepik.com/free-vector/quiz-background-with-flat-icons_23-2147596122.jpg?w=996'); }
+  .games::before { background-image: url('https://images.unsplash.com/photo-1614680376408-81e91ffe3db7?auto=format&fit=crop&w=1000&q=80'); }
+
+  footer { margin-top: 50px; padding: 20px; font-size: 0.9em; color: #aaa; }
+
+  select, button {
+    padding: 25px 25px;
+    font-size: 1.3em;
+    border: none;
+    border-radius: 18px;
+    background: #1a1a2e;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  select:hover, button:hover {
+    background: #ff007f;
+    color: #fff;
+  }
+  select:focus { outline: none; background: #2b2b4f; color: #ff66b2; }
+
+  .movies-list, .quiz-container {
+    margin: 40px auto;
+    width: 80%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px;
+  }
+
+  .movie-card, .quiz-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.1);
+    transition: all 0.3s;
+  }
+  .movie-card:hover, .quiz-card:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 20px #ff007f;
+  }
+
+  .movie-card h3, .quiz-question {
+    color: #66d4ff;
+    font-size: 1.7em;
+    text-shadow: 0 0 10px rgba(255, 0, 127, 0.7);
+  }
+
+  .back-btn { margin-top: 20px; }
+  #moviesPage, #quizPage { display: none; }
+
+  .selector-container {
+    margin: 50px auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .option-btn {
+    display: block;
+    background: #1a1a2e;
+    margin: 10px auto;
+    padding: 12px;
+    border-radius: 10px;
+    width: 50%;
+    transition: all 0.3s ease;
+    font-size: 1.2em;
+    text-align: left;
+  }
+  .option-btn:hover { background: #ff007f; transform: scale(1.02); }
+  .correct { background: #28a745 !important; color: #fff; }
+  .wrong { background: #dc3545 !important; color: #fff; }
+
+  .fade-in { animation: fadeIn 0.7s ease; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  /* Meme Page */
+  #memePage { display: none; }
+  .meme-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+  }
+  .meme-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 20px;
+    width: 320px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.1);
+    animation: fadeIn 0.6s ease;
+  }
+  .meme-card img {
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 0 15px #ff007f;
+  }
+  .meme-text {
+    margin-top: 15px;
+    font-size: 1.2em;
+    color: #66d4ff;
+    text-shadow: 0 0 10px #ff007f;
+  }
+  /* Meme Page */
+.meme-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
+.meme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255,255,255,0.05);
+  padding: 20px;
+  border-radius: 20px;
+  width: 320px;
+  box-shadow: 0 0 20px rgba(255,255,255,0.1);
+  animation: fadeIn 0.6s ease;
+}
+
+.meme-card img {
+  width: 100%;
+  border-radius: 15px;
+  box-shadow: 0 0 15px #ff007f;
+}
+
+.meme-text {
+  margin-top: 15px;
+  font-size: 1.2em;
+  color: #66d4ff;
+  text-shadow: 0 0 10px #ff007f;
+}
+/* Tic Tac Toe Modal Styling */
+  .game-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 1000;
+    animation: fadeIn 0.5s ease;
+  }
+  .game-content {
+    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    border-radius: 20px;
+    width: 340px;
+    margin: 8% auto;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 0 30px #ff007f;
+    animation: popIn 0.6s ease;
+  }
+  .close-btn {
+    float: right;
+    font-size: 28px;
+    cursor: pointer;
+    color: #fff;
+  }
+  .close-btn:hover { color: #ff007f; }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    gap: 8px;
+    justify-content: center;
+    margin: 20px auto;
+  }
+  .cell {
+    width: 100px;
+    height: 100px;
+    font-size: 2em;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #2b2b4f;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .cell:hover { background: #ff007f; transform: scale(1.05); }
+
+  #gameStatus {
+    font-size: 1.2em;
+    margin: 10px 0;
+    color: #66d4ff;
+    text-shadow: 0 0 10px #ff007f;
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .memes::before {
+  background-image: url('https://img.freepik.com/premium-photo/funny-memes-concept-collage-design_1194-537223.jpg?w=996');
+}
+
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="homePage">
+  <header>
+    <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png">
+    <h1>Entertainment Hub</h1>
+  </header>
+
+  <div class="section-container">
+    <div class="section-card movies" onclick="openMovies()"><div class="section-label">🎬 Movies</div></div>
+    <div class="section-card memes" onclick="openMemes()"><div class="section-label">😂 Memes</div></div>
+    <div class="section-card quiz" onclick="openQuiz()"><div class="section-label">🧠 Quiz</div></div>
+    <div class="section-card games"><div class="section-label">🎮 Games</div></div>
+  </div>
+
+  <footer>© 2025 Entertainment Hub | Made with ❤️ by Maithili</footer>
+</div>
+
+<!-- MOVIES -->
+<div id="moviesPage">
+  <header><h1>🎬 Explore Movies</h1></header>
+  <div class="selector-container">
+    <select id="genre">
+      <option value="">Select Genre</option>
+      <option value="action">Action</option>
+      <option value="comedy">Comedy</option>
+      <option value="romance">Romance</option>
+      <option value="horror">Horror</option>
+      <option value="scifi">Sci-Fi</option>
+    </select>
+    <select id="language">
+      <option value="">Select Language</option>
+      <option>Tamil</option>
+      <option>Telugu</option>
+      <option>Hindi</option>
+      <option>English</option>
+      <option>Malayalam</option>
+      <option>Kannada</option>
+    </select>
+    <button onclick="showMovies()">Show Movies</button>
+  </div>
+  <div id="moviesList" class="movies-list"></div>
+  <button class="back-btn" onclick="goHome()">⬅ Back to Home</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quizPage">
+  <header><h1>🧠 Movie Quiz</h1></header>
+  <div class="selector-container">
+    <select id="quizLang">
+      <option value="">Select Language</option>
+      <option>Tamil</option>
+      <option>Telugu</option>
+      <option>Hindi</option>
+      <option>English</option>
+      <option>Malayalam</option>
+      <option>Kannada</option>
+    </select>
+    <button onclick="startQuiz()">Start Quiz</button>
+  </div>
+  <div id="quizContainer" class="quiz-container"></div>
+  <button class="back-btn" onclick="goHome()">⬅ Back to Home</button>
+</div>
+
+<!-- MEME PAGE -->
+<div id="memePage" style="display:none;">
+  <header><h1>😂 Meme Generator</h1></header>
+  <button onclick="generateMeme()">Generate Meme</button>
+  <div id="memeContainer" class="meme-container"></div>
+  <button class="back-btn" onclick="goHome()">⬅ Back to Home</button>
+</div>
+
+<!-- 🎮 Tic Tac Toe Game Modal -->
+<div id="gameModal" class="game-modal">
+  <div class="game-content">
+    <span class="close-btn" onclick="closeGame()">&times;</span>
+    <h2>🎮 Tic Tac Toe</h2>
+    <div id="board" class="board"></div>
+    <p id="gameStatus"></p>
+    <button onclick="resetGame()">🔁 Restart</button>
+  </div>
+</div>
+
+
+<script>
+  // 🎮 Tic Tac Toe Game Logic
+  const gameModal = document.getElementById("gameModal");
+  const board = document.getElementById("board");
+  const statusText = document.getElementById("gameStatus");
+  let currentPlayer = "X";
+  let cells = Array(9).fill("");
+
+  // Attach click event to Games section
+  document.querySelector(".games").addEventListener("click", openGame);
+
+  function openGame() {
+    gameModal.style.display = "block";
+    initBoard();
+  }
+
+  function closeGame() {
+    gameModal.style.display = "none";
+  }
+
+  function initBoard() {
+    board.innerHTML = "";
+    cells.fill("");
+    currentPlayer = "X";
+    statusText.textContent = `Player ${currentPlayer}'s Turn`;
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+      cell.addEventListener("click", () => makeMove(i));
+      board.appendChild(cell);
+    }
+  }
+
+  function makeMove(i) {
+    if (cells[i] !== "") return;
+    cells[i] = currentPlayer;
+    const cellElements = document.querySelectorAll(".cell");
+    cellElements[i].textContent = currentPlayer;
+    if (checkWinner()) {
+      statusText.textContent = `🎉 Player ${currentPlayer} Wins!`;
+      setTimeout(() => alert(`Player ${currentPlayer} Wins!`), 400);
+      return;
+    }
+    if (!cells.includes("")) {
+      statusText.textContent = "🤝 It's a Draw!";
+      return;
+    }
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+    statusText.textContent = `Player ${currentPlayer}'s Turn`;
+  }
+
+  function checkWinner() {
+    const winPatterns = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+    return winPatterns.some(pattern =>
+      pattern.every(index => cells[index] === currentPlayer)
+    );
+  }
+
+  function resetGame() {
+    initBoard();
+  }
+
+  // Close modal when clicking outside
+  window.onclick = function(e) {
+    if (e.target === gameModal) closeGame();
+  };
+</script>
+
+<script>
+function openMovies(){ homePage.style.display="none"; moviesPage.style.display="block"; }
+function openQuiz(){ homePage.style.display="none"; quizPage.style.display="block"; }
+function goHome(){
+  moviesPage.style.display = "none";
+  quizPage.style.display = "none";
+  memePage.style.display = "none";
+  homePage.style.display = "block";
+}
+
+
+const moviesData = {
+  action: {
+    Tamil:["Vikram","Kaithi","Master","Leo","Beast","Thunivu","Theri","Petta"],
+    Telugu:["Pushpa","RRR","Salaar","Baahubali","Saaho","Akhanda","Sarkaru Vaari Paata","Spyder"],
+    Hindi:["War","Pathaan","Tiger Zinda Hai","Baaghi 3","Uri","Singham","Sooryavanshi","Shershaah"],
+    English:["John Wick","Avengers: Endgame","Inception","Dark Knight","Tenet","Gladiator","Mad Max","Mission Impossible"],
+    Malayalam:["Lucifer","Kurup","Kaduva","Bheeshma Parvam","Theevandi","Mohanlal","Ayyappanum Koshiyum","Drishyam 2"],
+    Kannada:["KGF","Kantara","Roberrt","James","Yuvarathnaa","Vikrant Rona","Ugramm","Bell Bottom"]
+  },
+  comedy: {
+    Tamil:["Boss Engira Bhaskaran","OK OK","Nanban","Soodhu Kavvum","Kalakalappu","Thamizh Padam","Imsai Arasan","Velai Illa Pattadhaari"],
+    Telugu:["Jathi Ratnalu","F2","DJ Tillu","Ala Modalaindi","Bommarillu","Bheeshma","Seema Sastri","Venky"],
+    Hindi:["Hera Pheri","Welcome","Dhamaal","Housefull","Chup Chup Ke","Hungama","Bhool Bhulaiyaa","Golmaal"],
+    English:["The Hangover","Superbad","Ted","21 Jump Street","Yes Man","Grown Ups","Step Brothers","Mr. Bean’s Holiday"],
+    Malayalam:["Kilukkam","Ramji Rao Speaking","Punjabi House","Kalyanaraman","CID Moosa","Chronic Bachelor","Chotta Mumbai","Nadodikkattu"],
+    Kannada:["Victory","Guru Shishyaru","Rambo","Googly","Kirik Party","Chowka","Raambo 2","Love Mocktail"]
+  },
+  romance: {
+    Tamil:["96","Remo","Enai Noki Paayum Thota","Vaaranam Aayiram","Minnale","OK Kanmani","Thullatha Manamum Thullum","Kadhal"],
+    Telugu:["Geetha Govindam","Majili","Fidaa","Arjun Reddy","Ye Maaya Chesave","Sita Ramam","Uppena","Orange"],
+    Hindi:["YJHD","Kabir Singh","Aashiqui 2","Dil Bechara","Tamasha","Jab We Met","Veer-Zaara","DDLJ"],
+    English:["The Notebook","La La Land","Titanic","Me Before You","Pride and Prejudice","The Vow","To All the Boys","Fault in Our Stars"],
+    Malayalam:["Premam","Anuraga Karikkin Vellam","Thattathin Marayathu","Hridayam","June","Charlie","Bangalore Days","Ustad Hotel"],
+    Kannada:["Simple Agi Ondh Love Story","Love Mocktail","Mungaru Male","Milana","Bhajarangi 2","Romeo","Googly","Paramathma"]
+  },
+  horror: {
+    Tamil:["Pizza","Maya","Aval","Kanchana","Aranmanai","Demonte Colony","Yaamirukka Bayamey","Chandramukhi"],
+    Telugu:["Anando Brahma","Raju Gari Gadhi","Prema Katha Chitram","Avunu","Taxiwaala","Geethanjali","Masooda","Ekkadiki Pothavu Chinnavada"],
+    Hindi:["Tumbbad","Bhoot","Stree","Pari","1920","The House Next Door","Chhorii","Raat"],
+    English:["The Conjuring","Annabelle","IT","Insidious","The Nun","Sinister","Smile","Get Out"],
+    Malayalam:["Ezra","The Priest","Pretham","Bhoothakaalam","Adam Joan","Neelavelicham","Kshanakathu","Manichitrathazhu"],
+    Kannada:["Shhh!","6-5=2","Karvva","Aake","Victory 2","U Turn","Damayanthi","RangiTaranga"]
+  },
+  scifi: {
+    Tamil:["2.0","Indru Netru Naalai","Enthiran","Tik Tik Tik","Maayavan","KO 2","Miruthan","Bhoomi"],
+    Telugu:["Aditya 369","Eega","1 Nenokkadine","Awara Paagal Deewana","Okka Kshanam","Kalki 2898 AD","Agent Sai","24"],
+    Hindi:["Krrish","Robot","Ra.One","PK","Drona","Attack","Mr. India","Cargo"],
+    English:["Interstellar","Inception","Matrix","Avatar","Dune","Blade Runner 2049","Gravity","The Martian"],
+    Malayalam:["Android Kunjappan","9","My Boss","Carbon","Kuttanadan Marpappa","Double Barrel","CIA","Villain"],
+    Kannada:["Lucia","Karma","6-5=2","Godhi Banna","Kurukshetra","Hero","Vikrant Rona","Ulidavaru Kandanthe"]
+  }
+};
+// Open Meme Page
+function openMemes() {
+  document.getElementById("homePage").style.display = "none";
+  document.getElementById("memePage").style.display = "block";
+}
+
+// Meme Generator
+const memes = [
+  {img:"https://i.imgflip.com/1bij.jpg",text:"That moment when bug fixes another bug."},
+  {img:"https://i.imgflip.com/26am.jpg",text:"Me waiting for the output to load..."},
+  {img:"https://i.imgflip.com/2fm6x.jpg",text:"Online classes be like: Can you hear me now?"},
+  {img:"https://i.imgflip.com/1otk96.jpg",text:"When you forget to save and system restarts 😭"},
+  {img:"https://i.imgflip.com/3vzej.jpg",text:"Group projects: 1 works, 4 watch 😂"},
+  {img:"https://i.imgflip.com/2/1h7in3.jpg",text:"AI: I don’t make mistakes, only happy accidents."},
+  {img:"https://i.imgflip.com/4t0m5.jpg",text:"That one friend who always says 'trust me bro' 😅"},
+  {img:"https://i.imgflip.com/1ur9b0.jpg",text:"Me debugging for 3 hours then realizing it’s a typo."},
+  {img:"https://i.imgflip.com/4acd7j.jpg",text:"Submitting the project 1 minute before deadline 🔥"}
+];
+let memeIndex = 0;
+function generateMeme() {
+  const memeContainer = document.getElementById("memeContainer");
+  if (memeIndex < memes.length) {
+    const meme = memes[memeIndex++];
+    const div = document.createElement("div");
+    div.className = "meme-card";
+    div.innerHTML = `<img src="${meme.img}"><div class="meme-text">${meme.text}</div>`;
+    memeContainer.appendChild(div);
+  } else {
+    alert("All 10 memes generated!");
+  }
+}
+
+
+const quizData = {
+  Tamil: [
+    {q: "In the movie “Vikram”, who plays the lead role?", a: ["Vijay", "Kamal Haasan", "Suriya", "Dhanush"], correct: 1},
+    {q: "Which Tamil movie is known for “Enna da rascalaa”?", a: ["Enthiran","Sivaji","Mersal","Bigil"], correct: 1},
+    {q: "Who directed “Kaithi”?", a: ["Lokesh Kanagaraj","AR Murugadoss","Atlee","Gautham Menon"], correct: 0},
+    {q: "Which movie features the song “Rowdy Baby”?", a: ["Theri","Maari 2","Master","VIP"], correct: 1},
+    {q: "In “2.0”, what is Rajinikanth’s robot name?", a: ["Robo","Chitti","Endhiran","Nano"], correct: 1}
+  ],
+  Telugu: [
+    {q:"Who played Pushpa Raj in 'Pushpa: The Rise'?", a:["Vijay Deverakonda","Allu Arjun","Nani","Prabhas"], correct:1},
+    {q:"In which movie does Mahesh Babu say 'Mind Block'?", a:["Sarileru Neekevvaru","Pokiri","Businessman","Maharshi"], correct:0},
+    {q:"Name of the kingdom in 'Baahubali'?", a:["Mahishmati","Gandhara","Aryavarta","Indraprastha"], correct:0},
+    {q:"Who directed 'RRR'?", a:["Trivikram","SS Rajamouli","Sukumar","Koratala"], correct:1},
+    {q:"'Jathi Ratnalu' is primarily a?", a:["Action","Comedy","Thriller","Romance"], correct:1}
+  ],
+  Hindi: [
+    {q:"Which movie features Rancho?", a:["PK","3 Idiots","Dhoom 3","Tamasha"], correct:1},
+    {q:"Who played Kabir Singh?", a:["Ranbir Kapoor","Shahid Kapoor","Salman Khan","Varun Dhawan"], correct:1},
+    {q:"Which movie introduced 'Kal Ho Naa Ho'?", a:["Kabhi Khushi","Kal Ho Naa Ho","Kalank","Kaho Naa Pyaar Hai"], correct:1},
+    {q:"Who is the lead actor in 'Pathaan'?", a:["Salman Khan","Shah Rukh Khan","Hrithik Roshan","Ranveer Singh"], correct:1},
+    {q:"'Shershaah' is based on which hero?", a:["Sandeep Unnikrishnan","Vikram Batra","Manekshaw","Somnath Sharma"], correct:1}
+  ],
+  English: [
+    {q:"Who plays Iron Man?", a:["Chris Evans","Robert Downey Jr.","Chris Hemsworth","Mark Ruffalo"], correct:1},
+    {q:"In 'Inception', what tests reality?", a:["A coin","A spinning top","A dream machine","A glass cube"], correct:1},
+    {q:"Who directed 'Avatar'?", a:["James Cameron","Spielberg","Nolan","Ridley Scott"], correct:0},
+    {q:"Spaceship name in 'Interstellar'?", a:["Discovery","Endurance","Enterprise","Odyssey"], correct:1},
+    {q:"Who says 'I am vengeance'?", a:["Iron Man","Spider-Man","Batman","Superman"], correct:2}
+  ],
+  Malayalam: [
+    {q:"Who directed 'Drishyam'?", a:["Jeethu Joseph","Lal Jose","Vineeth S.","Priyadarshan"], correct:0},
+    {q:"Who stars as Khureshi Ab’raam in 'Lucifer'?", a:["Mohanlal","Dulquer","Fahadh","Mammootty"], correct:0},
+    {q:"'Premam' was directed by?", a:["Anjali Menon","Alphonse Puthren","Vineeth","Basil Joseph"], correct:1},
+    {q:"Profession of main in 'Android Kunjappan'?", a:["Robot scientist","Doctor","Engineer","Teacher"], correct:0},
+    {q:"In 'Bheeshma Parvam', who plays Michael?", a:["Dulquer","Mammootty","Fahadh","Mohanlal"], correct:1}
+  ],
+  Kannada: [
+    {q:"Who plays Rocky Bhai in 'KGF'?", a:["Puneeth","Yash","Darshan","Sudeep"], correct:1},
+    {q:"Tagline 'A Mother’s Promise'?", a:["KGF 2","Roberrt","Vikrant Rona","Yuvarathnaa"], correct:0},
+    {q:"'Lucia' is famous for being?", a:["Crowd-funded","Longest","Remake","Short film"], correct:0},
+    {q:"Who directed 'Kantara'?", a:["Rakshit","Rishab Shetty","Sudeep","Upendra"], correct:1},
+    {q:"Who played ghost in 'U Turn'?", a:["Shraddha Srinath","Hariprriya","Rachita Ram","Priyamani"], correct:0}
+  ]
+};
+
+let currentQuestion=0,currentScore=0,quiz=[];
+function startQuiz(){
+  const lang=quizLang.value;
+  if(!lang){quizContainer.innerHTML="<h3>Please select a language!</h3>";return;}
+  quiz=quizData[lang];
+  currentQuestion=0;currentScore=0;
+  showQuestion();
+}
+function showQuestion(){
+  const qObj=quiz[currentQuestion];
+  quizContainer.innerHTML=`
+  <div class="quiz-card fade-in">
+    <div class="quiz-question">${currentQuestion+1}. ${qObj.q}</div>
+    ${qObj.a.map((opt,i)=>`<button class='option-btn' onclick='checkAnswer(${i})'>${opt}</button>`).join('')}
+  </div>`;
+}
+function checkAnswer(i){
+  const qObj=quiz[currentQuestion];
+  const buttons=document.querySelectorAll('.option-btn');
+  buttons.forEach(b=>b.disabled=true);
+  if(i===qObj.correct){buttons[i].classList.add('correct');currentScore++;}
+  else buttons[i].classList.add('wrong');
+  setTimeout(()=>{
+    currentQuestion++;
+    if(currentQuestion<quiz.length)showQuestion();
+    else quizContainer.innerHTML=`<h2 class='fade-in'>Your Score: ${currentScore}/${quiz.length} 🎉</h2>`;
+  },800);
+}
+function showMovies(){
+  const genre=document.getElementById('genre').value;
+  const lang=document.getElementById('language').value;
+  const list=document.getElementById('moviesList');
+  list.innerHTML='';
+  if(!genre||!lang){list.innerHTML='<h3>Please select both Genre and Language!</h3>';return;}
+  const movies=moviesData[genre]?.[lang];
+  if(movies)movies.forEach(m=>{
+    const d=document.createElement('div');
+    d.className='movie-card fade-in';
+    d.innerHTML=`<h3>${m}</h3>`;
+    list.appendChild(d);
+  });
+  else list.innerHTML='<h3>No movies found!</h3>';
+}
+</script>
+</body>
+</html>
